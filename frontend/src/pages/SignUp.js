@@ -10,32 +10,28 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink} from 'react-router-dom'
-
-// function Copyright(props) {
-//   return (
-//     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}
-//       {'.'}
-//     </Typography>
-//   );
-// }
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
+import axios from 'axios'
 const defaultTheme = createTheme();
 
-export default function SignIn() {
+export default function SignUp() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
+      firstname: data.get('firstName'),
+      lastname: data.get('lastName'),
       email: data.get('email'),
       password: data.get('password'),
-    });
+    })
+    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/register',
+    {
+      firstname: data.get('firstName'),
+      lastname: data.get('lastName'),
+      email: data.get('email'),
+      password: data.get('password'),
+    })
+    .then(res => console.log(res))
+    .catch(error => console.log(error))
   };
 
   return (
@@ -61,7 +57,7 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              name="First name"
+              name="firstName"
               label="First name"
               id="firstName"
             />
@@ -69,7 +65,7 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              name="Last name"
+              name="lastName"
               label="Last name"
               id="lastName"
             />

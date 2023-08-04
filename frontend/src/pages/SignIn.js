@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink} from 'react-router-dom'
+import axios from 'axios';
 // function Copyright(props) {
 //   return (
 //     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -36,7 +37,14 @@ export default function SignIn() {
     console.log({
       email: data.get('email'),
       password: data.get('password'),
-    });
+    })
+    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate',
+    {
+      email: data.get('email'),
+      password: data.get('password'),
+    })
+    .then(res => console.log(res))
+    .catch(error => console.log(error))
   };
 
   return (
