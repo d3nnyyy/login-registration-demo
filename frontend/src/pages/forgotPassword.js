@@ -14,40 +14,22 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink} from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios';
-// function Copyright(props) {
-//   return (
-//     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://mui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}
-//       {'.'}
-//     </Typography>
-//   );
-// }
-
-// TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
-
-export default function SignIn() {
-  const { handleSubmit, register, formState: { errors } } = useForm();
-
-  const onSubmit = (data) => {
-    console.log({
-      email:data.email,
-      password: data.password
-    })
-    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate', 
-    {
-      email:data.email,
-      password: data.password
-    })
-      .then(res => console.log(res))
-      .catch(error => console.log(error));
-  };
-  return (
+export default function ForgotPassword() {
+    const { handleSubmit, register, formState: { errors } } = useForm();
+    const onSubmit = (data) => {
+        console.log({
+          email:data.email,
+        })
+        axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate', 
+        {
+          email:data.email,
+        })
+          .then(res => console.log(res))
+          .catch(error => console.log(error));
+      };
+return(
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
@@ -63,7 +45,7 @@ export default function SignIn() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Input recovery email
           </Typography>
           <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -85,42 +67,21 @@ export default function SignIn() {
               error={!!errors.email}
               helperText={errors.email?.message}
             />
-            <TextField
-              {...register('password', {
-                required: 'Password is required',
-              })}
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Reset password
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link component={RouterLink} to='/forgotpassword' variant='body2'>
-                  Forgot password?
-                </Link>
+                
               </Grid>
               <Grid item>
-                <Link component={RouterLink} to='/signup' variant='body2'>
-                  Don't have an account? Sign Up
+                <Link component={RouterLink} to='/' variant='body2'>
+                  Back to login page
                 </Link>
               </Grid>
             </Grid>
@@ -128,5 +89,5 @@ export default function SignIn() {
         </Box>
       </Container>
     </ThemeProvider>
-  );
+)
 }
