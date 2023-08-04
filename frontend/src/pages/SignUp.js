@@ -10,28 +10,29 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink} from 'react-router-dom'
+import { useForm } from 'react-hook-form'
 import axios from 'axios'
 const defaultTheme = createTheme();
-
 export default function SignUp() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      firstname: data.get('firstName'),
-      lastname: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/register',
+  const { handleSubmit, register, formState: { errors } } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(
     {
-      firstname: data.get('firstName'),
-      lastname: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
+      firstname:data.firstName,
+      lastName:data.lastName,
+      email:data.email,
+      password: data.password
+    });
+    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/register', 
+    {
+      firstname:data.firstName,
+      lastName:data.lastName,
+      email:data.email,
+      password: data.password
     })
-    .then(res => console.log(res))
-    .catch(error => console.log(error))
+      .then(res => console.log(res))
+      .catch(error => console.log(error));
   };
 
   return (
@@ -52,51 +53,75 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="firstName"
-              label="First name"
-              id="firstName"
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="lastName"
-              label="Last name"
-              id="lastName"
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+      <TextField
+        {...register('firstName', { required: 'First name is required' })}
+        margin="normal"
+        required
+        fullWidth
+        name="firstName"
+        label="First name"
+        id="firstName"
+        error={!!errors.firstName}
+        helperText={errors.firstName?.message}
+      />
+      <TextField
+        {...register('lastName', { required: 'Last name is required' })}
+        margin="normal"
+        required
+        fullWidth
+        name="lastName"
+        label="Last name"
+        id="lastName"
+        error={!!errors.lastName}
+        helperText={errors.lastName?.message}
+      />
+      <TextField
+        {...register('email', {
+          required: 'Email address is required',
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+            message: 'Invalid email address'
+          }
+        })}
+        margin="normal"
+        required
+        fullWidth
+        id="email"
+        label="Email Address"
+        name="email"
+        autoComplete="email"
+        autoFocus
+        error={!!errors.email}
+        helperText={errors.email?.message}
+      />
+      <TextField
+        {...register('password', {
+          required: 'Password is required',
+          minLength: {
+            value: 8,
+            message: 'Password must be at least 8 characters long'
+          }
+        })}
+        margin="normal"
+        required
+        fullWidth
+        name="password"
+        label="Password"
+        type="password"
+        id="password"
+        autoComplete="current-password"
+        error={!!errors.password}
+        helperText={errors.password?.message}
+      />
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+      >
+        Sign Up
+      </Button>
             <Grid container>
               <Grid item xs>
                 {/* <Link component={RouterLink} to='/' variant="body2">

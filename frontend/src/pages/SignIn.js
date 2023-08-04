@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink} from 'react-router-dom'
+import { useForm } from 'react-hook-form'
 import axios from 'axios';
 // function Copyright(props) {
 //   return (
@@ -31,22 +32,21 @@ import axios from 'axios';
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate',
-    {
-      email: data.get('email'),
-      password: data.get('password'),
-    })
-    .then(res => console.log(res))
-    .catch(error => console.log(error))
-  };
+  const { handleSubmit, register, formState: { errors } } = useForm();
 
+  const onSubmit = (data) => {
+    console.log({
+      email:data.email,
+      password: data.password
+    })
+    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate', 
+    {
+      email:data.email,
+      password: data.password
+    })
+      .then(res => console.log(res))
+      .catch(error => console.log(error));
+  };
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -65,8 +65,15 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
             <TextField
+              {...register('email', {
+                required: 'Email address is required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  message: 'Invalid email address'
+                }
+              })}
               margin="normal"
               required
               fullWidth
@@ -75,8 +82,13 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
             <TextField
+              {...register('password', {
+                required: 'Password is required',
+              })}
               margin="normal"
               required
               fullWidth
@@ -85,6 +97,8 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              error={!!errors.password}
+              helperText={errors.password?.message}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -112,7 +126,6 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
     </ThemeProvider>
   );
