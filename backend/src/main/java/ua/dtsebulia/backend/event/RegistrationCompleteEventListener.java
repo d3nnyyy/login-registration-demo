@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import ua.dtsebulia.backend.config.JwtService;
 import ua.dtsebulia.backend.user.User;
-import ua.dtsebulia.backend.user.UserService;
+import ua.dtsebulia.backend.auth.AuthenticationService;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
 
-    private final UserService userService;
+    private final AuthenticationService userService;
     private final JavaMailSender mailSender;
     private final JwtService jwtService;
 
