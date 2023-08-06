@@ -31,7 +31,8 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         user = event.getUser();
         String verificationToken = jwtService.generateToken(new HashMap<>(), user);
         userService.saveUserVerificationToken(user, verificationToken);
-        String url = event.getApplicationUrl() + "/api/v1/auth/verifyEmail?token=" + verificationToken;
+//        String url = event.getApplicationUrl() + "/api/v1/auth/verifyEmail?token=" + verificationToken;
+        String url = "http://localhost:3000/verify/" + verificationToken;
         try {
             sendVerificationEmail(url);
         } catch (MessagingException | UnsupportedEncodingException e) {
