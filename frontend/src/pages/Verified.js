@@ -12,9 +12,10 @@ import { useEffect } from "react";
 import axios from "axios";
 export default function Verified() {
   const { token } = useParams();
-  useEffect(() => {
+  useEffect(async () => {
     console.log(token)
-    axios.post(`http://localhost:9191/api/v1/auth/verifyEmail?token=${token}`,)
+    await axios.get(`http://localhost:9191/api/v1/auth/verifyEmail?token=${token}`,).then(res => console.log(res))
+   // eslint-disable-next-line
   }, [])
   const defaultTheme = createTheme();
   return (

@@ -12,8 +12,15 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
+import { useState } from 'react';
+import { IconButton, InputAdornment } from '@mui/material';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 const defaultTheme = createTheme();
 export default function SignUp() {
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
   const { handleSubmit, register, formState: { errors } } = useForm();
   const navigate = useNavigate()
   const onSubmit = (data) => {
@@ -113,7 +120,18 @@ export default function SignUp() {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
+              InputProps={{ // <-- This is where the toggle button is added.
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>)}}
               id="password"
               autoComplete="current-password"
               error={!!errors.password}
