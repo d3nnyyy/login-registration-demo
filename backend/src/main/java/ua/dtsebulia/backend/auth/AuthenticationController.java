@@ -100,7 +100,7 @@ public class AuthenticationController {
         }
     }
 
-    private void resendRegistrationToken(User user, String applicationUrl, VerificationToken verificationToken) throws MessagingException, UnsupportedEncodingException {
+    private void resendRegistrationToken(User user, String applicationUrl, VerificationToken verificationToken) throws MessagingException, UnsupportedEncodingException, MessagingException {
         String url = applicationUrl + "/api/v1/auth/verifyEmail?token=" + verificationToken.getToken();
         eventListener.sendVerificationEmail(url);
         log.info("Click the link to verify your email :  {}", url);
