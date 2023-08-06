@@ -9,13 +9,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 const defaultTheme = createTheme();
 export default function SignUp() {
   const { handleSubmit, register, formState: { errors } } = useForm();
-
+  const navigate = useNavigate()
   const onSubmit = (data) => {
     console.log(
       {
@@ -34,7 +34,9 @@ export default function SignUp() {
         password: data.password,
         role: 'USER'
       })
-      .then(res => console.log(res))
+      .then(res => {
+        navigate('/')
+        console.log(res)})
       .catch(error => console.log(error));
   };
 

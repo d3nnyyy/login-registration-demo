@@ -1,7 +1,9 @@
 import './App.css';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp'
-import ForgotPassword from './pages/forgotPassword';
+import Home from './pages/Home'
+import ForgotPassword from './pages/ForgotPassword';
+import Verified from './pages/Verified';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -9,8 +11,10 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
+          <Route path='/verified' element={<Verified/>}/>
+          <Route path='/' element={<Home/>}/>
           <Route path='/forgotpassword' element={<ForgotPassword/>}/>
-          <Route path='/' element={<SignIn/>}/>
+          <Route path='/login' element={<SignIn/>}/>
           <Route path='/signup' element={<SignUp/>}/>
       </Routes>
     </BrowserRouter>

@@ -11,7 +11,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as RouterLink} from 'react-router-dom'
+import { Link as RouterLink, useNavigate} from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios';
 // function Copyright(props) {
@@ -33,18 +33,21 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
   const { handleSubmit, register, formState: { errors } } = useForm();
-
+  const navigate = useNavigate()
   const onSubmit = (data) => {
     console.log({
       email:data.email,
       password: data.password
     })
-    axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate', 
+    const deployed_api = 'http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate'
+    axios.post('http://localhost:9191/api/v1/auth/login', 
     {
       email:data.email,
       password: data.password
     })
-      .then(res => console.log(res))
+      .then(res => {
+        navigate('/')
+        console.log(res)})
       .catch(error => console.log(error));
   };
   return (
