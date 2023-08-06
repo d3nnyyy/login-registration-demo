@@ -20,7 +20,7 @@ export default function ForgotPassword() {
         console.log({
           email:data.email,
         })
-        axios.post('http://login-registration-demo.eu-central-1.elasticbeanstalk.com/api/v1/auth/authenticate', 
+        axios.post('http://localhost:9191/api/v1/auth/passowrd-reset-request', 
         {
           email:data.email,
         })

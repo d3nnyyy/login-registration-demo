@@ -11,15 +11,13 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
-          <Route path='/verified' element={<Verified/>}/>
+          <Route path='/verify/:token' element={<Verified/>}/>
           <Route path='/' element={<Home/>}/>
           <Route path='/forgotpassword' element={<ForgotPassword/>}/>
           <Route path='/login' element={<SignIn/>}/>
           <Route path='/signup' element={<SignUp/>}/>
       </Routes>
     </BrowserRouter>
-      
-    
      </>
   );
 }

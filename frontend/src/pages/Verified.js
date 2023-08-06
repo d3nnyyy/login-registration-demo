@@ -7,7 +7,15 @@ import { ThemeProvider } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
+import { useParams } from 'react-router-dom';
+import { useEffect } from "react";
+import axios from "axios";
 export default function Verified() {
+  const { token } = useParams();
+  useEffect(() => {
+    console.log(token)
+    axios.post(`http://localhost:9191/api/v1/auth/verifyEmail?token=${token}`,)
+  }, [])
   const defaultTheme = createTheme();
   return (
     <ThemeProvider theme={defaultTheme}>
