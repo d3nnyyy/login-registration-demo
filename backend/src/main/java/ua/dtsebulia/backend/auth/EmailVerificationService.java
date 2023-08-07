@@ -30,13 +30,18 @@ public class EmailVerificationService {
             throw new VerificationException("This account has already been verified, please login.");
         }
 
-        String verificationResult = verificationTokenService.validateToken(token);
+        try {
+            String verificationResult = verificationTokenService.validateToken(token);
 
-        if (verificationResult.equalsIgnoreCase("valid")) {
-            User user = theToken.getUser();
-            user.setEnabled(true);
-            authenticationService.saveUser(user);
-            return "Email verified successfully. Now you can login to your account.";
+            if (verificationResult.equalsIgnoreCase("valid")) {
+                User user = theToken.getUser();
+                user.setEnabled(true);
+                authenticationService.saveUser(user);
+                return "Email verified successfully. Now you can login to your account.";
+            }
+
+        } catch (InvalidTokenException e) {
+            return "Invalid verification token. Get a new verification link: " + getResendVerificationLink(token);
         }
 
         return "Invalid verification token. Get a new verification link: " + getResendVerificationLink(token);
