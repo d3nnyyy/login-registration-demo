@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import ua.dtsebulia.backend.auth.password.PasswordResetRequest;
@@ -12,6 +13,8 @@ import ua.dtsebulia.backend.auth.password.PasswordResetService;
 import ua.dtsebulia.backend.auth.token.ResendVerificationTokenService;
 import ua.dtsebulia.backend.exception.InvalidTokenException;
 import ua.dtsebulia.backend.exception.PasswordResetException;
+import ua.dtsebulia.backend.exception.UserAlreadyExistsException;
+import ua.dtsebulia.backend.exception.VerificationException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -31,7 +34,11 @@ public class AuthenticationController {
             HttpServletRequest request) {
         try {
             return ResponseEntity.ok(authenticationService.register(registrationRequest, request));
-        } catch (Exception e) {
+        } catch (UserAlreadyExistsException e) {
+            log.error("User already exists: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists.");
+        }
+        catch (Exception e) {
             log.error("Error during registration: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during registration.");
         }
@@ -42,20 +49,30 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest authenticationRequest) {
         try {
             return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
             log.error("Authentication error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
+        } catch (Exception e) {
+            log.error("Unexpected error during authentication: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during authentication.");
         }
     }
 
     @GetMapping("/verifyEmail")
-    public ResponseEntity<?> verifyEmail(
+    public ResponseEntity<String> verifyEmail(
             @RequestParam("token") String token) {
         try {
-            return ResponseEntity.ok(emailVerificationService.verifyEmail(token));
+            emailVerificationService.verifyEmail(token);
+            return ResponseEntity.ok("Email verified successfully. Now you can login to your account.");
+        } catch (InvalidTokenException e) {
+            log.error("Invalid verification token: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Invalid verification token.");
+        } catch (VerificationException e) {
+            log.error("Verification error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Verification failed: " + e.getMessage());
         } catch (Exception e) {
             log.error("Email verification error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email verification failed.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during email verification.");
         }
     }
 
