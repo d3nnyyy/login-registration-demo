@@ -25,7 +25,6 @@ public class PasswordResetTokenService {
         if (token == null) {
             return "Invalid password reset token";
         }
-        User user = token.getUser();
         Calendar calendar = Calendar.getInstance();
         if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
             return "Token already expired";
