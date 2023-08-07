@@ -36,11 +36,15 @@ public class AuthenticationController {
             return ResponseEntity.ok(authenticationService.register(registrationRequest, request));
         } catch (UserAlreadyExistsException e) {
             log.error("User already exists: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists.");
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("User already exists.");
         }
         catch (Exception e) {
             log.error("Error during registration: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during registration.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during registration.");
         }
     }
 
@@ -51,10 +55,14 @@ public class AuthenticationController {
             return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));
         } catch (AuthenticationException e) {
             log.error("Authentication error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid username or password.");
         } catch (Exception e) {
             log.error("Unexpected error during authentication: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during authentication.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during authentication.");
         }
     }
 
@@ -66,13 +74,19 @@ public class AuthenticationController {
             return ResponseEntity.ok("Email verified successfully. Now you can login to your account.");
         } catch (InvalidTokenException e) {
             log.error("Invalid verification token: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Invalid verification token.");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid verification token.");
         } catch (VerificationException e) {
             log.error("Verification error: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Verification failed: " + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Verification failed" + e.getMessage());
         } catch (Exception e) {
             log.error("Email verification error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during email verification.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during email verification.");
         }
     }
 
@@ -84,7 +98,9 @@ public class AuthenticationController {
             return ResponseEntity.ok(resendVerificationTokenService.resendVerificationToken(oldToken, request));
         } catch (Exception e) {
             log.error("Resend verification token error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while resending verification token.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while resending verification token.");
         }
     }
 
@@ -97,10 +113,14 @@ public class AuthenticationController {
             return ResponseEntity.ok(result);
         } catch (UsernameNotFoundException e) {
             log.error("Username not found: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("User not found.");
         } catch (Exception e) {
             log.error("Password reset request error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during password reset request.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during password reset request.");
         }
     }
 
@@ -113,13 +133,19 @@ public class AuthenticationController {
             return ResponseEntity.ok(result);
         } catch (InvalidTokenException e) {
             log.error("Invalid password reset token: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Invalid password reset token.");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid password reset token.");
         } catch (PasswordResetException e) {
             log.error("Password reset error: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Password reset failed.");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Password reset failed.");
         } catch (Exception e) {
             log.error("Unexpected error during password reset: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during password reset.");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred during password reset.");
         }
     }
 }
