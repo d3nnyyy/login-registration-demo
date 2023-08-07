@@ -32,12 +32,6 @@ public class VerificationToken {
         this.expirationTime = this.getTokenExpirationTime();
     }
 
-    public VerificationToken(String token) {
-        super();
-        this.token = token;
-        this.expirationTime = this.getTokenExpirationTime();
-    }
-
     public Date getTokenExpirationTime() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(new Date().getTime());
