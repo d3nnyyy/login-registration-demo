@@ -1,20 +1,22 @@
 package ua.dtsebulia.backend.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ua.dtsebulia.backend.auth.password.PasswordResetTokenService;
 import ua.dtsebulia.backend.auth.token.VerificationToken;
 import ua.dtsebulia.backend.auth.token.VerificationTokenRepository;
 import ua.dtsebulia.backend.config.JwtService;
+import ua.dtsebulia.backend.event.RegistrationCompleteEvent;
 import ua.dtsebulia.backend.exception.UserAlreadyExistsException;
 import ua.dtsebulia.backend.user.User;
 import ua.dtsebulia.backend.user.UserRepository;
 
-import java.util.Calendar;
-import java.util.HashMap;
+import java.net.URI;
 import java.util.Optional;
 
 @Service
@@ -23,74 +25,32 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PasswordResetTokenService passwordResetTokenService;
     private final VerificationTokenRepository tokenRepository;
     private final JwtService jwtService;
+    private final ApplicationEventPublisher publisher;
     private final AuthenticationManager authenticationManager;
 
-    public User register(RegistrationRequest request) {
-        Optional<User> user = this.findByEmail(request.getEmail());
+    public ResponseEntity<?> register(RegistrationRequest registrationRequest, HttpServletRequest request) {
+        Optional<User> user = this.findByEmail(registrationRequest.getEmail());
+
         if (user.isPresent()) {
             throw new UserAlreadyExistsException(
-                    "User with email " + request.getEmail() + " already exists");
+                    "User with email " + registrationRequest.getEmail() + " already exists");
         }
-        var newUser = new User();
-        newUser.setFirstName(request.getFirstname());
-        newUser.setLastName(request.getLastname());
-        newUser.setEmail(request.getEmail());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setRole(request.getRole());
-        return userRepository.save(newUser);
-    }
 
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+        User newUser = User.builder()
+                .firstName(registrationRequest.getFirstname())
+                .lastName(registrationRequest.getLastname())
+                .email(registrationRequest.getEmail())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
+                .role(registrationRequest.getRole())
+                .build();
+        userRepository.save(newUser);
 
-    public void saveUserVerificationToken(User theUser, String token) {
-        var verificationToken = new VerificationToken(token, theUser);
-        tokenRepository.save(verificationToken);
-    }
+        publisher.publishEvent(new RegistrationCompleteEvent(newUser, applicationUrl(request)));
 
-    public String validateToken(String theToken) {
-        VerificationToken token = tokenRepository.findByToken(theToken);
-        if (token == null) {
-            return "Invalid verification token";
-        }
-        User user = token.getUser();
-        Calendar calendar = Calendar.getInstance();
-        if ((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
-            tokenRepository.delete(token);
-            return "Token already expired";
-        }
-        user.setEnabled(true);
-        userRepository.save(user);
-        return "valid";
-    }
+        return ResponseEntity.ok("Registration successful. Please check your email for verification link");
 
-    public void createPasswordResetTokenForUser(User user, String passwordToken) {
-        passwordResetTokenService.createPasswordResetTokenForUser(user, passwordToken);
-    }
-
-    public VerificationToken generateNewVerificationToken(String oldToken) {
-        VerificationToken token = tokenRepository.findByToken(oldToken);
-        var verificationTokenTime = new VerificationToken();
-        token.setToken(jwtService.generateToken(new HashMap<>(), token.getUser()));
-        token.setExpirationTime(verificationTokenTime.getExpirationTime());
-        return tokenRepository.save(token);
-    }
-
-    public String validatePasswordResetToken(String passwordResetToken) {
-        return passwordResetTokenService.validatePasswordResetToken(passwordResetToken);
-    }
-
-    public User findUserByPasswordResetToken(String passwordResetToken) {
-        return passwordResetTokenService.findUserByPasswordResetToken(passwordResetToken).get();
-    }
-
-    public void changeUserPassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -105,8 +65,25 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
+    public void saveUserVerificationToken(User theUser, String token) {
+        var verificationToken = new VerificationToken(token, theUser);
+        tokenRepository.save(verificationToken);
+    }
+
+    public void changeUserPassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
     public void saveUser(User user) {
         userRepository.save(user);
     }
 
+    public String applicationUrl(HttpServletRequest request) {
+        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
 }
