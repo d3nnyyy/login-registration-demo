@@ -23,6 +23,7 @@ export default function SignUp() {
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const { handleSubmit, register, formState: { errors } } = useForm();
   const navigate = useNavigate()
+  const [errorMessage, setErrorMessage] = useState('');
   const onSubmit = (data) => {
     console.log(
       {
@@ -42,9 +43,15 @@ export default function SignUp() {
         role: 'USER'
       })
       .then(res => {
-        navigate('/')
-        console.log(res)})
-      .catch(error => console.log(error));
+        // navigate('/')
+        console.log(res)
+      })
+      .catch(error => {
+        if (error.response && error.response.data) {
+          setErrorMessage(error.response.data);
+        }
+        console.log(error);
+      });
   };
 
   return (
@@ -127,16 +134,20 @@ export default function SignUp() {
                     <IconButton
                       aria-label="toggle password visibility"
                       onClick={handleClickShowPassword}
-                      
+
                     >
                       {showPassword ? <Visibility /> : <VisibilityOff />}
                     </IconButton>
-                  </InputAdornment>)}}
+                  </InputAdornment>)
+              }}
               id="password"
               autoComplete="current-password"
               error={!!errors.password}
               helperText={errors.password?.message}
             />
+            <Typography component="h1" variant="h5" color="error">
+              {errorMessage}
+            </Typography>
             <Button
               type="submit"
               fullWidth
