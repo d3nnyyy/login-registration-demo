@@ -3,7 +3,6 @@ package ua.dtsebulia.backend.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +15,6 @@ import ua.dtsebulia.backend.exception.UserAlreadyExistsException;
 import ua.dtsebulia.backend.user.User;
 import ua.dtsebulia.backend.user.UserRepository;
 
-import java.net.URI;
 import java.util.Optional;
 
 @Service
@@ -30,7 +28,7 @@ public class AuthenticationService {
     private final ApplicationEventPublisher publisher;
     private final AuthenticationManager authenticationManager;
 
-    public ResponseEntity<?> register(RegistrationRequest registrationRequest, HttpServletRequest request) {
+    public String register(RegistrationRequest registrationRequest, HttpServletRequest request) {
         Optional<User> user = this.findByEmail(registrationRequest.getEmail());
 
         if (user.isPresent()) {
@@ -49,7 +47,7 @@ public class AuthenticationService {
 
         publisher.publishEvent(new RegistrationCompleteEvent(newUser, applicationUrl(request)));
 
-        return ResponseEntity.ok("Registration successful. Please check your email for verification link");
+        return "Registration successful. Please check your email for verification link";
 
     }
 
